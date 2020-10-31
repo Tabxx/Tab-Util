@@ -17,14 +17,15 @@ class DocumentKeywordController extends Base {
     const reader = fs.createReadStream(file.path);
     let hz = file.name.split('.')[1];
     let name = +new Date();
-    let filePath = path.join(__dirname, assetPath) + `/${name + '.' + hz}`;
+
+    let filePath = path.join(__dirname, assetPath) + `/${file.name}`;
     // 创建可写流
     const upStream = fs.createWriteStream(filePath);
     // 可读流通过管道写入可写流
     reader.pipe(upStream);
     return ctx.body = {
       code: 0,
-      data: name + '.' + hz
+      data: file.name
     };
   }
 
@@ -33,7 +34,10 @@ class DocumentKeywordController extends Base {
    * @param {*} ctx 
    */
   async IdentifyKeywords(ctx) {
-    let { keyword, fileHash } = ctx.query
+    let {
+      keyword,
+      fileHash
+    } = ctx.query
     if (!fileHash) {
       super.fail(ctx, -1, 'Please upload the file first')
       return
@@ -50,7 +54,7 @@ class DocumentKeywordController extends Base {
       let keywordRegExp = new RegExp(keywordArray.join('|'), 'ig')
       let result = keywordRegExp.test(data) ? true : false
 
-      super.success(ctx, result)
+      super.success(ctx, result, data)
     } catch (error) {
       // 读取文件错误
       super.fail(ctx, -1, error.message)

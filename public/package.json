@@ -6,7 +6,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "element-ui": "^2.14.0",
+    "element-plus": "^1.0.1-alpha.12",
     "vue": "^3.0.2",
     "vue-router": "^4.0.0-rc.1"
   },

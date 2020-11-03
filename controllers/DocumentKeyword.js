@@ -1,8 +1,9 @@
 const Base = require('./Base')
-const path = require('path');
+const path = require('path')
+const mammoth = require('mammoth')
 const fs = require('fs')
 const assetPath = '../static'
-const _prefix = '$#tab#$'
+const _prefix = '$tab$'
 
 class DocumentKeywordController extends Base {
 
@@ -45,8 +46,22 @@ class DocumentKeywordController extends Base {
     // 文件绝对路径
     let filePath = path.join(__dirname, assetPath, fileHash)
 
+    const getDocxContent = path => {
+      return new Promise((resolve, reject) => {
+        mammoth.extractRawText({ path })
+          .then(function (result) {
+            resolve(result.value);
+          }).done()
+      })
+    }
+
+    let data = null;
     try {
-      let data = fs.readFileSync(filePath, 'utf8')
+      if (fileHash.indexOf('.docx') > -1) {
+        data = await getDocxContent(filePath);
+      } else {
+        data = fs.readFileSync(filePath, 'utf8')
+      }
       // 关键词校验，并兼容多关键字
       let keywordArray = keyword.split(_prefix);
       if (!keywordArray || !keywordArray.length) super.fail(ctx, -1, 'Please enter the keywords！')
@@ -54,7 +69,7 @@ class DocumentKeywordController extends Base {
       let keywordRegExp = new RegExp(keywordArray.join('|'), 'ig')
       let result = keywordRegExp.test(data) ? true : false
 
-      super.success(ctx, result, data)
+      super.success(ctx, result)
     } catch (error) {
       // 读取文件错误
       super.fail(ctx, -1, error.message)

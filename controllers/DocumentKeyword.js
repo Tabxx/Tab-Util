@@ -91,6 +91,14 @@ class DocumentKeywordController extends Base {
     return arr;
   }
 
+  sort(ctx) {
+    let {
+      arr
+    } = ctx.query
+    let result = this.bubbleSort(arr.split(',').map(item => parseInt(item)))
+    super.success(ctx, result);
+  }
+
 
 }
 
